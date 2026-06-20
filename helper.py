@@ -5,6 +5,7 @@ import pandas as pd
 import emoji
 from matplotlib import font_manager
 from urlextract import URLExtract
+
 extractor = URLExtract()
 
 def remove_ommitted(message):
@@ -37,8 +38,9 @@ def fetch_stats(selected_user , df):
 
     # 4. Fetch number of links shared
     links = []
-    for message in df['message']:
-        links.extend(extractor.find_urls(message))
+    for messge in df['user_message']:
+        links.extend(extractor.find_urls(messge))
+    
     
     return num_messages,len(words),num_media_message,len(links)
     
