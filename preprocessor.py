@@ -31,13 +31,15 @@ def clean_umessage(x):
 
 def preprocess(data):
     
-    pattern = r'\u200e?\[\d{1,2}/\d{1,2}/\d{2},\s\d{2}:\d{2}:\d{2}\]\s'
-
+    # pattern =  r'(?:\[\d{1,2}/\d{1,2}/\d{2},\s\d{2}:\d{2}:\d{2}\]\s|\d{1,2}/\d{1,2}/\d{2},\s\d{2}:\d{2}\s-\s)'
+    pattern =  r'(?:\[\d{1,2}/\d{1,2}/\d{2},\s\d{2}:\d{2}:\d{2}\]\s|\d{1,2}/\d{1,2}/\d{2},\s\d{2}:\d{2}\s-\s)'
     messages = re.split(pattern, data)[1:]
-    dates = re.findall(r'\d{1,2}/\d{1,2}/\d{2},\s\d{2}:\d{2}:\d{2}',data)
+    date_pattern = r'\d{1,2}/\d{1,2}/\d{2},\s\d{2}:\d{2}(?::\d{2})?'
+    dates = re.findall(date_pattern,data)
 
     df = pd.DataFrame({'user_message':messages,'message_date':dates})
-    df['message_date']=pd.to_datetime(df['message_date'],format='%d/%m/%y, %H:%M:%S')
+    # df['message_date']=pd.to_datetime(df['message_date'],format='%d/%m/%y, %H:%M:%S')
+    df['message_date']=pd.to_datetime(df['message_date'])
     df.rename(columns={'message_date':'date'},inplace=True)
 
     users = []
@@ -70,7 +72,7 @@ def preprocess(data):
     df['user'] = df['user'].apply(clean_user)
     df['message'] = df['message'].apply(remove_punctuation)
     df['message'] = df['message'].apply(clean_umessage)
-
+    df['message'] = df['message'].apply(lambda x: x.lower())
     period = []
 
     for hour in df[['day_name','hour']]['hour']:

@@ -8,6 +8,20 @@ from urlextract import URLExtract
 
 extractor = URLExtract()
 
+f = open('stop_hinglish.txt','r')
+stop_words = f.read()
+
+def remove_stopwords(message):
+    t1 = []
+
+    for word in message.split():
+
+        if word not in stop_words:
+                t1.append(word)
+
+    return " ".join(t1)
+
+
 def remove_ommitted(message):
     t1 = []
 
@@ -51,10 +65,11 @@ def most_busy_users(df):
     return x,df2;
 
 def create_wordcloud(selected_user,df):
-
+    
     if selected_user != 'OverAll':
         df = df[df['user'] == selected_user]
     df['message'] =  df['message'].apply(remove_ommitted)
+    df['message'] =  df['message'].apply(remove_stopwords)
 
     wc = WordCloud(width = 500 , height = 500 , min_font_size = 10 , background_color = 'white')
     df_wc = wc.generate(df['message'].str.cat(sep=" "))
@@ -62,8 +77,7 @@ def create_wordcloud(selected_user,df):
     return df_wc
 
 def most_common_words(selected_user,df):
-    f = open('stop_hinglish.txt','r')
-    stop_words = f.read()
+    
     if selected_user != 'OverAll':
         df = df[df['user'] == selected_user]
     
